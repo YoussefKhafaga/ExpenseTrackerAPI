@@ -37,7 +37,6 @@ public class Expenses
             Title = expenseDTO.Title,
             Description = expenseDTO.Description,
             Amount = expenseDTO.Amount,
-            CreatedDate = expenseDTO.CreateDate,
             CategoryId = expenseDTO.CategoryId,
         };
     }

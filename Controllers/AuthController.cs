@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using ExpenseTrackerAPI.DTOs.UserDTOs;
 using ExpenseTrackerAPI.Services.UserServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTrackerAPI.Controllers
@@ -14,6 +16,16 @@ namespace ExpenseTrackerAPI.Controllers
         {
             _userServices = userServices;
         }
+        [Authorize]
+        [HttpGet("whoami")]
+        public async Task<IActionResult> WhoAmI()
+        {
+            var userId = await _userServices.GetCurrentUserIdAsync();
+            var userName = await _userServices.GetCurrentUserNameAsync();
+
+            return Ok(new { userId, userName });
+        }
+
 
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]

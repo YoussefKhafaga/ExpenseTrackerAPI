@@ -17,17 +17,19 @@ namespace ExpenseTrackerAPI.Controllers
             _expenseServices = expenseServices;
         }
 
+        
         [HttpGet("Expenses")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllExpenses()
+        public async Task<IActionResult> GetAllExpenses([FromQuery] ExpenseQueryParameters queryParams)
         {
             try
             {
-                var expenses = await _expenseServices.GetAllExpensesAsync();
+                var expenses = await _expenseServices.GetAllExpensesAsync(queryParams);
                 return Ok(expenses);
             }
             catch (UnauthorizedAccessException)
@@ -44,7 +46,9 @@ namespace ExpenseTrackerAPI.Controllers
             }
         }
 
-        [HttpPost("Expense")]
+        
+        [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,6 +56,7 @@ namespace ExpenseTrackerAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDTO expenseDto)
         {
+            Console.WriteLine("Creating Expense: " + expenseDto.Title);
             try
             {
                 var createdExpense = await _expenseServices.CreateExpenseAsync(expenseDto);
@@ -61,17 +66,15 @@ namespace ExpenseTrackerAPI.Controllers
             {
                 return BadRequest($"Invalid input: {ex.Message}");
             }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized("You must Login to create an expense.");
-            }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
+        
         [HttpGet("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -86,7 +89,7 @@ namespace ExpenseTrackerAPI.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized("You are not authorized to access this expense.");
+                return Forbid();
             }
             catch (KeyNotFoundException)
             {
@@ -97,8 +100,9 @@ namespace ExpenseTrackerAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        [Authorize]
+        
         [HttpPut("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -118,7 +122,7 @@ namespace ExpenseTrackerAPI.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized("You are not authorized to update this expense.");
+                return Forbid();
             }
             catch (KeyNotFoundException)
             {
@@ -130,8 +134,9 @@ namespace ExpenseTrackerAPI.Controllers
             }
         }
 
-        [Authorize]
+        
         [HttpDelete("{id:int}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -150,7 +155,7 @@ namespace ExpenseTrackerAPI.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                return Unauthorized("You are not authorized to delete this expense.");
+                return Forbid();
             }
             catch (Exception ex)
             {

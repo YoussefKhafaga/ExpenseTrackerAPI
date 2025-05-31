@@ -19,9 +19,19 @@ DotNetEnv.Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<ExpenseDBContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<ICategoryServices, CategoryServices>();
+builder.Services.AddScoped<IExpenseServices, ExpenseServices>();
+builder.Services.AddScoped<PasswordHasher<object>>();
+builder.Services.AddHttpContextAccessor();
 
 // DB Context
 builder.Services.AddDbContext<ExpenseDBContext>(options =>
@@ -33,7 +43,6 @@ builder.Services.AddDbContext<ExpenseDBContext>(options =>
 var secretKey = builder.Configuration["JWT_KEY"];
 var issuer = builder.Configuration["JWT_ISSUER"];
 var audience = builder.Configuration["JWT_AUDIENCE"];
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,17 +91,7 @@ builder.Services.AddSwaggerGen(c =>
         new string[] { }
     }});
 });
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ExpenseDBContext>()
-    .AddDefaultTokenProviders();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUserServices, UserServices>();
-builder.Services.AddScoped<ICategoryServices, CategoryServices>();
-builder.Services.AddScoped<IExpenseServices, ExpenseServices>();
-builder.Services.AddScoped<PasswordHasher<object>>();
-builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

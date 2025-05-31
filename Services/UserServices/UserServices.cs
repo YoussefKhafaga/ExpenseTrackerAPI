@@ -90,6 +90,12 @@ public class UserServices : IUserServices
         return userId;
     }
 
+    public async Task<string> GetCurrentUserNameAsync()
+    {
+        var userName = _httpContextAccessor.HttpContext?.User.Identity?.Name;
+        return userName;
+    }
+
     public async Task<string> RegisterUserAsync(RegisterDTO user)
     {
         if (user == null)

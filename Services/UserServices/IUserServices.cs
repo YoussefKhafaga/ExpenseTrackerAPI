@@ -9,5 +9,6 @@ public interface IUserServices
     Task<string> LoginUserAsync(LoginDTO user);
     Task<string> GetCurrentUserIdAsync();
     Task<string> GenerateToken(UserDTO user);
+    Task<string> GetCurrentUserNameAsync();
     
 }

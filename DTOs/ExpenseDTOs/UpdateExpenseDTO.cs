@@ -13,10 +13,7 @@ public record class UpdateExpenseDTO
     public decimal Amount { get; set; }
 
     [Required, DataType(DataType.DateTime)]
-    public DateTime CreateDate { get; set; }
-
-    [Required, DataType(DataType.DateTime)]
-    public DateTime UpdateDate { get; set; }
+    public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
 
     [Required]
     public int CategoryId { get; set; }
